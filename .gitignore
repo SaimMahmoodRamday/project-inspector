@@ -1,0 +1,22 @@
+# Environment files (in root, backend, frontend, or anywhere)
+**/.env
+**/.env.local
+
+# Python cache
+**/__pycache__/
+*.pyc
+
+# Node dependencies
+**/node_modules/
+
+# Build output
+**/dist/
+**/build/
+
+# Logs
+*.log
+
+# OS & IDE junk
+.DS_Store
+.vscode/
+.idea/

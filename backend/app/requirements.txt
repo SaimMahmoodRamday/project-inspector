@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+python-multipart
+networkx
+graphviz
+pydantic
+aiofiles
+jinja2
+pyyaml
+pdfkit      # optional (requires wkhtmltopdf for PDF)
+markdown
+langchain-google-genai
+python-dotenv
+groq
+langchain-core

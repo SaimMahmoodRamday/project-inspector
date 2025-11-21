@@ -4,6 +4,7 @@ import ReportView from "./components/ReportView";
 
 export default function App() {
   const [report, setReport] = useState(null);
+  console.log("APP: report =", report);
 
   return (
     <div>

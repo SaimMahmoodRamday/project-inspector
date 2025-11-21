@@ -98,7 +98,7 @@ except FileNotFoundError:
 
 # Primary LLM (Gemini)
 llm_gemini = ChatGoogleGenerativeAI(
-    model="gemini-1.5-flash",
+    model="gemini-1.5-flash-latest",
     temperature=0.3,
     google_api_key=google_api_key
 )

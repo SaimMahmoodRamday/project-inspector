@@ -229,10 +229,11 @@ def summarize_with_llm(file_path: str, code: str) -> str:
     print("=======================\n")
 
     prompt = f"""
-    Summarize the purpose of this file in 3-4 short sentences.
-    Include the main functionality, key components, and role in the project.
-    Avoid code listings, be concise.
-
+    Provide the output in the following structure:
+    summary: <1-2 sentence summary of the file's purpose and main functionality>
+    external_functions_used: <list external functions/classes imported from other project files , or "none">
+    Keep formatting exactly as shown above. Be concise , Do NOT bold text , Do NOT include code.
+    
     File path: {file_path}
     Code:
     ```{cleaned_code}```

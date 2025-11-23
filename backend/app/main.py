@@ -10,8 +10,15 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 from app.analyzer import analyze_project
 import uvicorn
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title="Project Inspector")
+
+STATIC_DIR = Path("/app/static")
+STATIC_DIR.mkdir(parents=True, exist_ok=True)  # ensures folder exists
+
+# Serve call graph SVGs and any other static assets
+app.mount("/static", StaticFiles(directory="/app/static"), name="static")
 
 MAX_ZIP_SIZE = 200 * 1024 * 1024  # 200 MB, adjust as needed
 

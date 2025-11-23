@@ -70,6 +70,8 @@ ENV PATH="$VENV_PATH/bin:$PATH"
 
 WORKDIR /app
 
+# RUN mkdir -p /app/static
+
 # ✅ Correct path to requirements.txt
 COPY app/requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt

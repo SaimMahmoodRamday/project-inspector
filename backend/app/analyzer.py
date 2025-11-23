@@ -203,6 +203,8 @@ from graphviz import Digraph
 import markdown
 from app.summarizer import clean_code_for_summary, get_cached_summary
 import json
+import time  
+
 
 # ----------------------------
 # IGNORE CONSTANTS (ADDED)
@@ -326,15 +328,36 @@ def analyze_project(root: Path) -> Dict[str, Any]:
     # -------------------------------------------
     # Render call graph (unchanged)
     # -------------------------------------------
+    # dot = Digraph(comment="Call graph")
+    # for n in call_graph.nodes:
+    #     dot.node(n)
+    # for u, v in call_graph.edges:
+    #     dot.edge(u, v)
+
+    # graph_path = root / "call_graph.svg"
+    # dot.render(str(graph_path.with_suffix("")), format="svg", cleanup=True)
+    # report['call_graph'] = "call_graph.svg"
+
+    # New 01
+
     dot = Digraph(comment="Call graph")
     for n in call_graph.nodes:
         dot.node(n)
     for u, v in call_graph.edges:
         dot.edge(u, v)
 
-    graph_path = root / "call_graph.svg"
+    # Ensure static folder exists
+    STATIC_DIR = Path("/app/static")
+    STATIC_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Save SVG with a unique timestamp to avoid overwriting
+    graph_filename = f"call_graph_{int(time.time())}.svg"
+    graph_path = STATIC_DIR / graph_filename
     dot.render(str(graph_path.with_suffix("")), format="svg", cleanup=True)
-    report['call_graph'] = "call_graph.svg"
+
+    # Pass only the filename to frontend
+    report['call_graph'] = graph_filename
+
 
     # -------------------------------------------
     # Markdown summary (unchanged)
@@ -361,7 +384,7 @@ def analyze_project(root: Path) -> Dict[str, Any]:
     report['markdown'] = report_md
     report['html'] = markdown.markdown(report_md)
 
-    print(json.dumps(report['file_tree'], indent=2))
+    # print(json.dumps(report['file_tree'], indent=2))
 
 
     return report

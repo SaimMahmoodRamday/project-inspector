@@ -1,24 +1,167 @@
 {
-  "cff008494ebee3089c46f2133f171414": "summary: This script is part of a hostel management system and contains functionality for registering a new student. It uses a GUI created with tkinter to collect user input and validate it before uploading the data to the system.\n\nexternal_functions_used: \n- tkinter as tk\n- tkinter.messagebox\n- upload_data from register_login",
-  "bcfd48f2995834c90c2dddd827db3328": "summary: This file contains a function to create a login window for students in a hostel management system using the tkinter library.\n\nexternal_functions_used: tkinter (tk), tk.Toplevel, tk.Label, tk.Entry, tk.Button, tk.grid, tk.mainloop",
-  "26ff6018e3765c85a09133cd330c3f38": "summary: This script serves as the main entry point for the Hostel Management System, allowing users to choose between registration, login, or admin functions based on their user type. It uses various functions from other modules to facilitate these actions.\n\nexternal_functions_used: \n- choice_for_regis_or_login\n- choose_user\n- register\n- login\n- admin_menu\n- hostelite_menu",
-  "4ab119e13739919b373640cdddc83aee": "summary: This file contains two functions, `choice_for_regis_or_login` and `choose_user`, which handle user input validation for registration/login choice and user type selection, respectively.\n\nexternal_functions_used: none",
-  "1c1a1793cabb110514ec2a2ae4d118cc": "summary: This script creates a new window for student registration, prompting users to input their first name, last name, email, password, and confirm password. However, it seems to be incorrectly labeled as a login window.\n\nexternal_functions_used: \n- tkinter.Toplevel\n- tkinter.Label\n- tkinter.Entry\n- tkinter.Button\n- tkinter.grid\n- tkinter.mainloop",
-  "fe8c0d0470f10a992357451e002d0e19": "summary: This script creates a simple graphical user interface (GUI) for a hostel management system main menu, allowing users to choose between entering as a hostelite or an admin.\n\nexternal_functions_used: \n- open_hostelite_menu from Hostelite_gui\n- open_admin_menu from Admin_gui",
-  "2cc23649dcd68ddbdbbdd83770f96b52": "summary: This script is part of a hostel management system and provides a menu for hostelite features, including mess menu, prohibited materials, laundry, and changing settings. It uses tkinter for GUI and messagebox for displaying information.\n\nexternal_functions_used: \n- hostelite_functions.hostelite_menu\n- hostelite_functions.change_settings\n- register_login.register_login\n- messagebox (from tkinter)\n- register_login (from register_login)",
-  "3ed34d32c1d81283ccb7601105f67473": "summary: This script is part of a Hostel Management System and handles user registration and login functionality. It uses a CSV file to store user data and provides input validation for user names, emails, and passwords.\n\nexternal_functions_used: \n- read_csv_file\n- upload_data_to_file\n- messagebox",
-  "5c192c106df25138e1eae7b3f85b6239": "summary: This file provides a graphical user interface for students to log in to the hostel management system. It uses the login function from the register_login module to authenticate the user.\n\nexternal_functions_used: \n- login (from register_login)\n- hostelite_menu_2 (from hostelite_menu_2)\n- messagebox (from tkinter)",
-  "8282cd86ed117aae40d90e4b89e5e08d": "summary: This file is part of a Hostel Management System and provides a simple graphical user interface (GUI) with buttons for selecting 'Hostelite' and 'Admin' options.\nexternal_functions_used: none",
-  "225970a8330e71424b5a37a5573ef299": "summary: This file contains functions related to the hostelite's menu and settings, including mess ordering, prohibited materials, laundry, profile settings, and logout functionality.\n\nexternal_functions_used: \n- read_csv_file from read_csv_create_dataframe\n- upload_data_to_file from read_csv_create_dataframe\n- get_name from register_login\n- get_email from register_login\n- get_password from register_login\n- hostelite_menu (recursive call within itself)",
-  "9adee87a64573193d5e4a9c2e16e34d1": "summary: This file is used to read data from a CSV file and create a pandas DataFrame, and also to upload data from a DataFrame back to a CSV file. It provides two functions for these purposes.\n\nexternal_functions_used: \n- pandas.read_csv\n- pandas.DataFrame\n- pandas.to_csv\n- pandas.to_dict",
-  "67a8d64800c2ad003d51dd801d0903ae": "summary: This file contains a GUI function to open a hostelite menu, allowing users to register or login. The function creates a new window with two buttons for registration and login.\n\nexternal_functions_used: \n- student_register from Hostelite_register.py\n- student_login from student_login.py",
-  "29c177a1e84918ec077b8cf11eb19fd4": "summary: This file contains the functionality for an admin to register in the Hostel Management System. It checks for valid email and password, and then uploads the admin's data to the system.\n\nexternal_functions_used: \n- tkinter as tk\n- tkinter.messagebox\n- upload_data from register_login",
-  "48b0c737f09660f7e808510584b6db2e": "summary: This file contains the admin login functionality for the Hostel Management System. It creates a new window for admin login, takes email and password as input, and checks the credentials using the login function from the register_login module.\n\nexternal_functions_used: \n- login (from register_login module)\n- admin_functions (from admin_menu_2 module)\n- messagebox (from tkinter module)",
-  "f12b3824c2aac978730075868a607871": "summary: This file contains functions for an admin user in a hostel management system, including adding, displaying, and deleting hostelite data, as well as admin profile settings and logout functionality.\n\nexternal_functions_used: \n- read_csv_file\n- upload_data_to_file\n- register\n- get_email\n- get_name\n- get_password",
-  "a8f3ca7adce9d9b16a66cf4478e3d9c1": "summary: This file contains the implementation of the admin menu for a hostel management system, providing features such as adding, displaying, and deleting hostelite information, as well as changing settings.\n\nexternal_functions_used: \n- admin_functions.change_settings\n- admin_functions.admin_menu\n- read_csv_create_dataframe.read_csv_file\n- register_login.register_login\n- tkinter.messagebox\n- tkinter.ttk.Treeview\n- tkinter.Toplevel\n- tkinter.Button\n- tkinter.Label\n- tkinter.Entry",
-  "ec316c45971d7fcd170156b4359ec634": "summary: This file provides a graphical user interface for admin functionality, allowing them to choose between registering or logging in to the system. It creates a new window with buttons for registration and login.\n\nexternal_functions_used: \n- adm_register (from Admin_register.py)\n- adm_login (from Admin_login.py)",
-  "caf44f50a6d1160542df3af82b775103": "summary: This script uses Selenium to scrape job postings from LinkedIn based on search criteria, logging in to the user's LinkedIn account to access the search results.\n\nexternal_functions_used: \n- selenium.webdriver.Chrome\n- selenium.webdriver.common.by.By\n- selenium.webdriver.chrome.options.Options\n- selenium.webdriver.chrome.service.Service\n- selenium.webdriver.support.ui.WebDriverWait\n- selenium.webdriver.support.expected_conditions as EC\n- time.time\n- json (not used in this script)\n- selenium.webdriver.common.by.By.ID\n- selenium.webdriver.common.by.By.XPATH\n- selenium.webdriver.common.by.By.CSS_SELECTOR\n- selenium.webdriver.common.by.By.CSS_SELECTOR\n- selenium.webdriver.common.by.By.CSS_SELECTOR\n- selenium.webdriver.common.by.By.CSS_SELECTOR\n- selenium.webdriver.common.by.By.CSS_SELECTOR\n- selenium.webdriver.common.by.By.CSS_SELECTOR",
-  "03cc9836561879ed5289760ab3eed506": "summary: This script analyzes job postings from a JSON file, extracts the technology stack used in each job, and saves the results to a CSV file. It counts the occurrences of each tech skill and sorts the results by demand.\n\nexternal_functions_used: \n- json.load\n- re.search\n- pd.DataFrame\n- pd.DataFrame.sort_values\n- pd.DataFrame.to_csv\n- Counter",
-  "903c194e0a8852370d8988757ca50003": "summary: This script generates a histogram showing the most in-demand tech skills from LinkedIn job listings based on data from 'tech_demand.csv'.\n\nexternal_functions_used: \n- pd.read_csv (from pandas library)\n- plt.figure (from matplotlib.pyplot library)\n- sns.barplot (from seaborn library)\n- plt.xticks, plt.xlabel, plt.ylabel, plt.title, plt.savefig, plt.show (from matplotlib.pyplot library)",
-  "b5927b730f47245d0c6f8528ca88f6a1": "summary: This script is a main entry point for a LinkedIn job analysis tool, allowing users to scrape job listings based on a search query and location, and then analyze and visualize the results.\n\nexternal_functions_used: \n- linkedin_scraper.scrape_linkedin_jobs\n- analysis.extract_tech_stack\n- visualization.plot_histogram"
+  "206fcef1ca847bd73232c97d80e1392c": {
+    "summary": "This script uses Selenium to scrape job listings from LinkedIn based on user input, extracting job titles, companies, locations, and descriptions.",
+    "external_imports": [
+      "selenium",
+      "selenium.webdriver.common.by",
+      "selenium.webdriver.chrome.options",
+      "selenium.webdriver.chrome.service",
+      "selenium.webdriver.support.ui",
+      "selenium.webdriver.support",
+      "time",
+      "json"
+    ]
+  },
+  "03cc9836561879ed5289760ab3eed506": {
+    "summary": "Analyzes LinkedIn job postings to extract demand for specific technical skills and saves the results to a CSV file.",
+    "external_imports": [
+      "json",
+      "re",
+      "pandas as pd",
+      "collections as Counter"
+    ]
+  },
+  "903c194e0a8852370d8988757ca50003": {
+    "summary": "This script generates a histogram from a CSV file to visualize the most in-demand tech skills from LinkedIn job listings.",
+    "external_imports": [
+      "pandas",
+      "matplotlib.pyplot",
+      "seaborn"
+    ]
+  },
+  "b5927b730f47245d0c6f8528ca88f6a1": {
+    "summary": "This script scrapes LinkedIn job listings based on user input, saves them to a JSON file, and analyzes the job descriptions for tech skills, then generates a histogram.",
+    "external_imports": [
+      "linkedin_scraper",
+      "analysis",
+      "visualization"
+    ]
+  },
+  "cff008494ebee3089c46f2133f171414": {
+    "summary": "This script creates a GUI for registering a new hostelite with a tkinter window, validating user input for email and password, and uploading the data to a database.",
+    "external_imports": [
+      "upload_data",
+      "messagebox"
+    ]
+  },
+  "bcfd48f2995834c90c2dddd827db3328": {
+    "summary": "This script creates a simple login window for students in a hostel management system using Tkinter.",
+    "external_imports": [
+      "tkinter"
+    ]
+  },
+  "26ff6018e3765c85a09133cd330c3f38": {
+    "summary": "This script handles user choice and directs to registration, login, or admin/hostelite menu based on user input.",
+    "external_imports": [
+      "register_login",
+      "start",
+      "admin_functions",
+      "hostelite_functions"
+    ]
+  },
+  "4ab119e13739919b373640cdddc83aee": {
+    "summary": "This script provides a simple user interface for a hostel management system, allowing users to choose between registration, login, and selecting user type (admin or hostelite).",
+    "external_imports": []
+  },
+  "1c1a1793cabb110514ec2a2ae4d118cc": {
+    "summary": "This script creates a GUI window for student registration in a hostel management system.",
+    "external_imports": []
+  },
+  "fe8c0d0470f10a992357451e002d0e19": {
+    "summary": "This script creates a main menu for a hostel management system using tkinter, allowing users to choose between hostelite and admin modes.",
+    "external_imports": [
+      "Hostelite_gui",
+      "Admin_gui"
+    ]
+  },
+  "1a84f1aa05e1c0f92fc2bd355b56af73": {
+    "summary": "This script provides a graphical user interface for a hostel management system, offering various features and menus for hostelite users.",
+    "external_imports": [
+      "hostelite_functions",
+      "register_login"
+    ]
+  },
+  "3ed34d32c1d81283ccb7601105f67473": {
+    "summary": "This script handles user registration and login functionality for a hostel management system, utilizing a CSV file for data storage.",
+    "external_imports": [
+      "read_csv_file",
+      "upload_data_to_file"
+    ]
+  },
+  "5c192c106df25138e1eae7b3f85b6239": {
+    "summary": "This script provides a GUI login interface for students in a hostel management system, allowing them to enter their email and password to access the system.",
+    "external_imports": [
+      "register_login.login",
+      "hostelite_menu_2.hostelite_menu_2",
+      "tkinter.messagebox"
+    ]
+  },
+  "8282cd86ed117aae40d90e4b89e5e08d": {
+    "summary": "A simple GUI application for a hostel management system with two buttons for hostelite and admin selection.",
+    "external_imports": []
+  },
+  "225970a8330e71424b5a37a5573ef299": {
+    "summary": "This file contains functions for a hostel management system, handling user interactions and data management for hostelite users.",
+    "external_imports": [
+      "read_csv_file",
+      "upload_data_to_file",
+      "get_name",
+      "get_email",
+      "get_password"
+    ]
+  },
+  "9adee87a64573193d5e4a9c2e16e34d1": {
+    "summary": "This script reads a CSV file, converts it to a dictionary list, and provides functions to upload data to the same CSV file.",
+    "external_imports": [
+      "pandas"
+    ]
+  },
+  "67a8d64800c2ad003d51dd801d0903ae": {
+    "summary": "Hostelite GUI menu for registration and login functionality.",
+    "external_imports": [
+      "student_register",
+      "student_login"
+    ]
+  },
+  "29c177a1e84918ec077b8cf11eb19fd4": {
+    "summary": "Admin registration page for a hostel management system, validating user input and uploading data to the database.",
+    "external_imports": [
+      "register_login.upload_data"
+    ]
+  },
+  "48b0c737f09660f7e808510584b6db2e": {
+    "summary": "Admin login functionality for a hostel management system, allowing users to enter email and password to access the admin menu.",
+    "external_imports": [
+      "register_login.login",
+      "admin_menu_2.admin_functions",
+      "tkinter.messagebox"
+    ]
+  },
+  "f12b3824c2aac978730075868a607871": {
+    "summary": "This script contains functions for an admin user to manage hostelite data, including adding, displaying, deleting, and modifying data, as well as profile settings and logout functionality.",
+    "external_imports": [
+      "read_csv_file",
+      "upload_data_to_file",
+      "register",
+      "get_email",
+      "get_name",
+      "get_password"
+    ]
+  },
+  "09c5c57b238666448cad27de4481e946": {
+    "summary": "This script provides an admin menu for a hostel management system, allowing admins to add, display, and delete hostelite information, as well as change settings.",
+    "external_imports": [
+      "admin_functions",
+      "read_csv_create_dataframe",
+      "register_login",
+      "change_settings"
+    ]
+  },
+  "ec316c45971d7fcd170156b4359ec634": {
+    "summary": "This script creates a GUI for admin to choose between registration and login options.",
+    "external_imports": [
+      "adm_register",
+      "adm_login"
+    ]
+  }
 }

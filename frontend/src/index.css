@@ -5,3 +5,58 @@
 body {
   @apply bg-gray-50 text-gray-800 font-sans;
 }
+
+/* Enhanced markdown styling */
+.prose {
+  line-height: 1.7;
+  color: #374151;
+}
+
+.prose h1 {
+  @apply text-3xl font-bold mt-8 mb-6 text-gray-900 border-b pb-2;
+}
+
+.prose h2 {
+  @apply text-2xl font-bold mt-8 mb-4 text-gray-800 flex items-center gap-2;
+}
+
+.prose h3 {
+  @apply text-xl font-semibold mt-6 mb-3 text-gray-700 bg-gray-50 p-3 rounded-lg border-l-4 border-blue-500;
+}
+
+.prose p {
+  @apply mb-4 text-gray-600 leading-relaxed;
+}
+
+.prose ul {
+  @apply mb-6 ml-1 space-y-2;
+}
+
+.prose li {
+  @apply text-gray-600 leading-relaxed;
+}
+
+.prose code {
+  @apply bg-blue-50 px-2 py-1 rounded text-sm font-mono text-blue-700 border border-blue-200;
+}
+
+.prose strong {
+  @apply font-semibold text-gray-700;
+}
+
+.prose hr {
+  @apply my-8 border-gray-300;
+}
+
+/* Custom badges */
+.prose .status-badge {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+}
+
+.prose .status-success {
+  @apply bg-green-100 text-green-800;
+}
+
+.prose .status-error {
+  @apply bg-red-100 text-red-800;
+}

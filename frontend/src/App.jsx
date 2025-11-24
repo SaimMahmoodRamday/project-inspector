@@ -52,6 +52,8 @@
 
 // New 03
 
+// frontend/src/App.jsx
+
 import React, { useState } from "react";
 import UploadForm from "./components/UploadForm";
 import ReportView from "./components/ReportView";
@@ -62,7 +64,7 @@ export default function App() {
   const [report, setReport] = useState(null);
 
   return (
-    <div className="relative min-h-screen font-sans overflow-x-hidden bg-gray-50">
+    <div className="relative min-h-screen font-sans overflow-x-hidden">
       {/* Background Image */}
       <div
         className="absolute top-0 left-0 w-full h-full -z-10"
@@ -71,7 +73,7 @@ export default function App() {
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          opacity: 0.05,
+          opacity: 0.4,
         }}
       ></div>
 
@@ -98,3 +100,4 @@ export default function App() {
     </div>
   );
 }
+

@@ -76,6 +76,8 @@
 
 // New 03
 
+// frontend/src/components/FileTree.jsx
+
 import React from "react";
 
 const FileTree = ({ fileTree }) => {

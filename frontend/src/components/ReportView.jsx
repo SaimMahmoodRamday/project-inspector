@@ -48,36 +48,89 @@
 
 // New 03
 
+// frontend/src/components/ReportView.jsx
+
+// import React from "react";
+// import FileTree from "./FileTree";
+
+// export default function ReportView({ report }) {
+//   return (
+//     <div className="space-y-6">
+//       {/* File Tree */}
+//       {report.file_tree && (
+//         <div className="bg-white/90 backdrop-blur-md p-6 rounded-xl shadow-md hover:shadow-lg transition">
+//   <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
+//     <span>📄</span> File Tree
+//   </h2>
+//   <FileTree fileTree={report.file_tree} />
+// </div>
+
+//       )}
+
+//       {/* HTML Report */}
+//       {report.html && (
+//         <div className="bg-white p-6 rounded shadow">
+//           <h2 className="text-xl font-semibold mb-3">Summary</h2>
+//           <div dangerouslySetInnerHTML={{ __html: report.html }} />
+//         </div>
+//       )}
+
+//       {/* Call Graph */}
+//       {report.call_graph && (
+//         <div className="bg-white p-6 rounded shadow">
+//           <h2 className="text-xl font-semibold mb-3">Call Graph</h2>
+//           <img src={`/static/${report.call_graph}`} alt="Call Graph" className="w-full border rounded" />
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+// New 04
+
+// frontend/src/components/ReportView.jsx
 import React from "react";
 import FileTree from "./FileTree";
 
 export default function ReportView({ report }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* File Tree */}
       {report.file_tree && (
-        <div className="bg-white/90 backdrop-blur-md p-6 rounded-xl shadow-md hover:shadow-lg transition">
-  <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
-    <span>📄</span> File Tree
-  </h2>
-  <FileTree fileTree={report.file_tree} />
-</div>
-
+        <div className="bg-white/95 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-gray-200">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-3 text-gray-800">
+            <span className="text-2xl">📄</span> Project Structure
+          </h2>
+          <FileTree fileTree={report.file_tree} />
+        </div>
       )}
 
       {/* HTML Report */}
       {report.html && (
-        <div className="bg-white p-6 rounded shadow">
-          <h2 className="text-xl font-semibold mb-3">Summary</h2>
-          <div dangerouslySetInnerHTML={{ __html: report.html }} />
+        <div className="bg-white/95 backdrop-blur-md p-8 rounded-2xl shadow-lg border border-gray-200">
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-gray-800">
+            <span className="text-2xl">📊</span> Code Analysis
+          </h2>
+          <div 
+            className="prose prose-lg max-w-none"
+            dangerouslySetInnerHTML={{ __html: report.html }} 
+          />
         </div>
       )}
 
       {/* Call Graph */}
       {report.call_graph && (
-        <div className="bg-white p-6 rounded shadow">
-          <h2 className="text-xl font-semibold mb-3">Call Graph</h2>
-          <img src={`/static/${report.call_graph}`} alt="Call Graph" className="w-full border rounded" />
+        <div className="bg-white/95 backdrop-blur-md p-8 rounded-2xl shadow-lg border border-gray-200">
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-gray-800">
+            <span className="text-2xl">🔗</span> Function Call Graph
+          </h2>
+          <div className="bg-gray-50 p-4 rounded-xl border">
+            <img 
+              src={`/static/${report.call_graph}`} 
+              alt="Function Call Graph" 
+              className="w-full rounded-lg shadow-sm" 
+            />
+          </div>
         </div>
       )}
     </div>

@@ -204,6 +204,7 @@ import markdown
 from app.summarizer import clean_code_for_summary, get_cached_summary
 import json
 import time  
+from app.summarizer import get_cached_summary
 
 
 # ----------------------------
@@ -283,6 +284,7 @@ def analyze_project(root: Path) -> Dict[str, Any]:
     analyses = {}
     call_graph = nx.DiGraph()
 
+   # REPLACE WITH THIS:
     for p in root.rglob("*"):
         # skip ignored files/folders
         if should_ignore(p):
@@ -291,21 +293,27 @@ def analyze_project(root: Path) -> Dict[str, Any]:
         if p.is_file():
             ext = p.suffix.lower()
             lang = LANG_EXTENSIONS.get(ext)
+            relative_path = str(p.relative_to(root))
 
             if lang == "python":
                 try:
                     parsed = parse_python_file(p)
                     raw_code = p.read_text(encoding="utf-8", errors="ignore")
-                    safe_code = clean_code_for_summary(raw_code)
-                    llm_summary = get_cached_summary(str(p.relative_to(root)), safe_code)
-
-                    parsed["summary"] = llm_summary
-                    analyses[str(p.relative_to(root))] = {"lang": "python", **parsed}
+                    
+                    # Get structured summary (no need for clean_code_for_summary - it's handled in summarizer now)
+                    summary_data = get_cached_summary(relative_path, raw_code)
+                    
+                    # Ensure summary is properly stored
+                    analyses[relative_path] = {
+                        "lang": "python", 
+                        **parsed,
+                        "summary": summary_data  # This is now a dict
+                    }
 
                     # Graph nodes
                     for func in parsed.get("functions", []):
                         node_name = f"{p.name}:{func['name']}"
-                        call_graph.add_node(node_name, file=str(p.relative_to(root)), type="function")
+                        call_graph.add_node(node_name, file=relative_path, type="function")
 
                     # Graph edges
                     for edge in parsed.get("call_edges", []):
@@ -314,13 +322,19 @@ def analyze_project(root: Path) -> Dict[str, Any]:
                         call_graph.add_edge(caller, callee)
 
                 except Exception as e:
-                    analyses[str(p.relative_to(root))] = {"lang": "python", "error": str(e)}
+                    print(f"[ERROR] Failed to analyze {relative_path}: {e}")
+                    analyses[relative_path] = {
+                        "lang": "python", 
+                        "error": str(e),
+                        "summary": {"summary": "Analysis failed", "external_imports": []}
+                    }
 
             else:
-                # Non-python files (same behavior as before)
-                analyses[str(p.relative_to(root))] = {
+                # Non-python files
+                analyses[relative_path] = {
                     "lang": lang or "unknown",
-                    "note": "parsing not implemented"
+                    "note": "parsing not implemented",
+                    "summary": {"summary": "Non-Python file", "external_imports": []}
                 }
 
     report['files'] = analyses
@@ -359,32 +373,133 @@ def analyze_project(root: Path) -> Dict[str, Any]:
     report['call_graph'] = graph_filename
 
 
-    # -------------------------------------------
-    # Markdown summary (unchanged)
-    # -------------------------------------------
-    md = ["# Project Report", ""]
-    md.append("## File Summaries")
+    # # -------------------------------------------
+    # # Markdown summary (unchanged)
+    # # -------------------------------------------
+    # md = ["# Project Report", ""]
+    # md.append("## File Summaries")
 
-    for fname, info in analyses.items():
-        md.append(f"### {fname}")
-        md.append(f"Language: {info.get('lang')}")
+    # for fname, info in analyses.items():
+    #     md.append(f"### {fname}")
+    #     md.append(f"Language: {info.get('lang')}")
 
-        if info.get("error"):
-            md.append(f"Error: {info['error']}")
-        else:
-            if info.get("summary"):
-                md.append(info['summary'])
-            funcs = info.get("functions", [])
-            if funcs:
-                md.append("Functions:")
-                for f in funcs:
-                    md.append(f"- {f['name']} ({f['lineno']})")
+    #     if info.get("error"):
+    #         md.append(f"Error: {info['error']}")
+    #     else:
+    #         if info.get("summary"):
+    #             md.append(info['summary'])
+    #         funcs = info.get("functions", [])
+    #         if funcs:
+    #             md.append("Functions:")
+    #             for f in funcs:
+    #                 md.append(f"- {f['name']} ({f['lineno']})")
+
+    # report_md = "\n".join(md)
+    # report['markdown'] = report_md
+    # report['html'] = markdown.markdown(report_md)
+
+    # print(json.dumps(report['file_tree'], indent=2))
+
+
+    # -------------------------------------------
+    # Fixed Markdown summary
+    # -------------------------------------------
+    md = ["# 🗂️ Project Analysis Report", ""]
+
+    # Project Overview
+    python_files = [f for f, info in analyses.items() if info.get('lang') == 'python']
+    other_files = [f for f, info in analyses.items() if info.get('lang') != 'python']
+    total_functions = sum(len(info.get('functions', [])) for f, info in analyses.items() if info.get('functions'))
+
+    md.append("## 📊 Project Overview")
+    md.append("")
+    md.append(f"- **Python Files:** {len(python_files)}")
+    md.append(f"- **Other Files:** {len(other_files)}")
+    md.append(f"- **Total Functions:** {total_functions}")
+    md.append(f"- **Total Files:** {len(analyses)}")
+    md.append("")
+
+    # Python Files Analysis
+    if python_files:
+        md.append("## 🐍 Python Code Analysis")
+        md.append("")
+        
+        for i, fname in enumerate(python_files, 1):
+            info = analyses[fname]
+            md.append(f"### {i}. `{fname}`")
+            md.append("")
+            
+            if info.get("error"):
+                md.append("❌ **Error:** " + str(info["error"]))
+                md.append("")
+            else:
+                # Get summary data - ensure it's a dictionary
+                summary_data = info.get("summary", {})
+                if not isinstance(summary_data, dict):
+                    # Convert to dict if it's a string
+                    summary_data = {"summary": str(summary_data), "external_imports": []}
+                
+                # Summary
+                summary_text = summary_data.get("summary", "No summary available")
+                md.append("📝 **Summary:** " + str(summary_text))
+                md.append("")
+                
+                # External imports
+                external_imports = summary_data.get("external_imports", [])
+                if external_imports and external_imports != ["none"]:
+                    md.append("🔗 **Project Imports:**")
+                    for imp in external_imports:
+                        md.append(f"   - `{imp}`")
+                    md.append("")
+                else:
+                    md.append("🔗 **Project Imports:** None")
+                    md.append("")
+                
+                # Functions
+                funcs = info.get("functions", [])
+                if funcs:
+                    md.append("🔧 **Functions:**")
+                    for f in funcs:
+                        md.append(f"   - `{f['name']}` (line {f['lineno']})")
+                    md.append("")
+            
+            # Add separator only if not last file
+            if i < len(python_files):
+                md.append("---")
+                md.append("")
+
+    # Add this when parsing implemented for these. 
+
+    # Other Files Section
+    if other_files:
+        md.append("## 📁 Other Files")
+        md.append("")
+        
+        for i, fname in enumerate(other_files, 1):
+            info = analyses[fname]
+            md.append(f"### `{fname}`")
+            # md.append(f"**Type:** {info.get('lang', 'Unknown')}")
+            
+            # note = info.get("note")
+            # if note:
+                # md.append(f"**Note:** {note}")
+            
+            md.append("")
+            
+            # Add separator only if not last file
+            if i < len(other_files):
+                md.append("---")
+                md.append("")
+
+    # Clean up
+    while md and md[-1] in ["", "---"]:
+        md.pop()
+
+    # Ensure all items are strings before joining
+    md = [str(item) for item in md]
 
     report_md = "\n".join(md)
     report['markdown'] = report_md
     report['html'] = markdown.markdown(report_md)
-
-    # print(json.dumps(report['file_tree'], indent=2))
-
 
     return report

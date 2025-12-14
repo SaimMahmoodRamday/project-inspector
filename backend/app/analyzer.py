@@ -1,198 +1,4 @@
 
-# # backend/app/analyzer.py
-# from pathlib import Path
-# import os
-# from typing import Dict, Any, List
-# from app.parsers.python_parser import parse_python_file
-# import networkx as nx
-# from graphviz import Digraph
-# import markdown
-# from app.summarizer import clean_code_for_summary, get_cached_summary
-
-# import json
-
-# LANG_EXTENSIONS = {
-#     ".py": "python",
-#     ".js": "javascript",
-#     ".jsx": "javascript",
-#     ".java": "java",
-#     ".ts": "typescript",
-#     # extend as needed
-# }
-
-# def build_file_tree(root: Path) -> Dict:
-#     """Return a nested dict representing file tree"""
-#     def _recurse(p: Path):
-#         if p.is_file():
-#             return {"type": "file", "name": p.name}
-#         children = []
-#         for child in sorted(p.iterdir(), key=lambda x: (x.is_file(), x.name.lower())):
-#             children.append(_recurse(child))
-#         return {"type": "dir", "name": p.name, "children": children}
-#     return _recurse(root)
-
-# # def analyze_project(root: Path) -> Dict[str, Any]:
-# #     report = {}
-# #     root = Path(root)
-# #     report['file_tree'] = build_file_tree(root)
-
-# #     # Collect analyses per file
-# #     analyses = {}
-# #     call_graph = nx.DiGraph()
-
-# #     for p in root.rglob("*"):
-# #         if p.is_file():
-# #             ext = p.suffix.lower()
-# #             lang = LANG_EXTENSIONS.get(ext)
-# #             if lang == "python":
-# #                 try:
-# #                     parsed = parse_python_file(p)
-
-# #                     # Read and clean code for LLM
-# #                     raw_code = p.read_text(encoding="utf-8", errors="ignore")
-# #                     safe_code = clean_code_for_summary(raw_code)
-
-# #                     # Get Gemini summary (cached to save cost/time)
-# #                     llm_summary = get_cached_summary(str(p.relative_to(root)), safe_code)
-
-# #                     # Overwrite or enhance parsed summary
-# #                     parsed["summary"] = llm_summary
-
-# #                     analyses[str(p.relative_to(root))] = {"lang": "python", **parsed}
-
-# #                     # Add nodes/edges to call_graph
-# #                     for func in parsed.get("functions", []):
-# #                         node_name = f"{p.name}:{func['name']}"
-# #                         call_graph.add_node(node_name, file=str(p.relative_to(root)), type="function")
-# #                     for edge in parsed.get("call_edges", []):
-# #                         caller = f"{p.name}:{edge['caller']}"
-# #                         callee = f"{p.name}:{edge['callee']}"
-# #                         call_graph.add_edge(caller, callee)
-# #                 except Exception as e:
-# #                     analyses[str(p.relative_to(root))] = {"lang": "python", "error": str(e)}
-# #             else:
-# #                 # For other langs, we can add placeholder or sniff
-# #                 analyses[str(p.relative_to(root))] = {"lang": lang or "unknown", "note": "parsing not implemented"}
-
-# #     report['files'] = analyses
-
-# #     # Render call graph using graphviz
-# #     dot = Digraph(comment="Call graph")
-# #     for n in call_graph.nodes:
-# #         dot.node(n)
-# #     for u, v in call_graph.edges:
-# #         dot.edge(u, v)
-# #     graph_path = root / "call_graph.svg"
-# #     dot.render(str(graph_path.with_suffix("")), format="svg", cleanup=True)  # creates call_graph.svg
-# #     report['call_graph'] = "call_graph.svg"
-
-# #     # Create a simple markdown summary
-# #     md = ["# Project Report", ""]
-# #     md.append("## File Tree")
-# #     md.append("```")
-# #     def pretty_tree(d, prefix=""):
-# #         lines = []
-# #         name = d.get("name", "")
-# #         if d["type"] == "dir":
-# #             lines.append(f"{prefix}{name}/")
-# #             for c in d.get("children", []):
-# #                 lines.extend(pretty_tree(c, prefix + "  "))
-# #         else:
-# #             lines.append(f"{prefix}{name}")
-# #         return lines
-# #     md.extend(pretty_tree(report['file_tree']))
-# #     md.append("```")
-# #     md.append("## File Summaries")
-# #     for fname, info in analyses.items():
-# #         md.append(f"### {fname}")
-# #         md.append(f"Language: {info.get('lang')}")
-# #         if info.get("error"):
-# #             md.append(f"Error: {info['error']}")
-# #         else:
-# #             if info.get("summary"):
-# #                 md.append(info['summary'])
-# #             funcs = info.get("functions", [])
-# #             if funcs:
-# #                 md.append("Functions:")
-# #                 for f in funcs:
-# #                     md.append(f"- `{f['name']}` ({f['lineno']})")
-# #     report_md = "\n".join(md)
-# #     report['markdown'] = report_md
-# #     report['html'] = markdown.markdown(report_md)
-
-# #     return report
-
-# def analyze_project(root: Path) -> Dict[str, Any]:
-#     report = {}
-#     root = Path(root)
-
-#     # We will keep this nested dictionary for the frontend to use
-#     report['file_tree'] = build_file_tree(root)
-
-#     # Collect analyses per file
-#     analyses = {}
-#     call_graph = nx.DiGraph()
-#     for p in root.rglob("*"):
-#         if p.is_file():
-#             ext = p.suffix.lower()
-#             lang = LANG_EXTENSIONS.get(ext)
-#             if lang == "python":
-#                 try:
-#                     parsed = parse_python_file(p)
-#                     raw_code = p.read_text(encoding="utf-8", errors="ignore")
-#                     safe_code = clean_code_for_summary(raw_code)
-#                     llm_summary = get_cached_summary(str(p.relative_to(root)), safe_code)
-#                     parsed["summary"] = llm_summary
-#                     analyses[str(p.relative_to(root))] = {"lang": "python", **parsed}
-#                     for func in parsed.get("functions", []):
-#                         node_name = f"{p.name}:{func['name']}"
-#                         call_graph.add_node(node_name, file=str(p.relative_to(root)), type="function")
-#                     for edge in parsed.get("call_edges", []):
-#                         caller = f"{p.name}:{edge['caller']}"
-#                         callee = f"{p.name}:{edge['callee']}"
-#                         call_graph.add_edge(caller, callee)
-#                 except Exception as e:
-#                     analyses[str(p.relative_to(root))] = {"lang": "python", "error": str(e)}
-#             else:
-#                 analyses[str(p.relative_to(root))] = {"lang": lang or "unknown", "note": "parsing not implemented"}
-
-#     report['files'] = analyses
-
-#     # Render call graph using graphviz
-#     dot = Digraph(comment="Call graph")
-#     for n in call_graph.nodes:
-#         dot.node(n)
-#     for u, v in call_graph.edges:
-#         dot.edge(u, v)
-#     graph_path = root / "call_graph.svg"
-#     dot.render(str(graph_path.with_suffix("")), format="svg", cleanup=True)
-#     report['call_graph'] = "call_graph.svg"
-
-#     # Create a simple markdown summary without the file tree
-#     md = ["# Project Report", ""]
-#     md.append("## File Summaries")
-#     for fname, info in analyses.items():
-#         md.append(f"### {fname}")
-#         md.append(f"Language: {info.get('lang')}")
-#         if info.get("error"):
-#             md.append(f"Error: {info['error']}")
-#         else:
-#             if info.get("summary"):
-#                 md.append(info['summary'])
-#             funcs = info.get("functions", [])
-#             if funcs:
-#                 md.append("Functions:")
-#                 for f in funcs:
-#                     md.append(f"- {f['name']} ({f['lineno']})")
-
-#     report_md = "\n".join(md)
-#     report['markdown'] = report_md
-#     report['html'] = markdown.markdown(report_md)
-#     return report
-
-
-# New Code
-
 # backend/app/analyzer.py
 from pathlib import Path
 import os
@@ -206,6 +12,8 @@ import json
 import time  
 from app.summarizer import get_cached_summary
 
+from collections import defaultdict
+import math
 
 # ----------------------------
 # IGNORE CONSTANTS (ADDED)
@@ -272,134 +80,195 @@ def build_file_tree(root: Path) -> Dict:
 # ---------------------------------------------------
 # Analyze Project (with filtering)
 # ---------------------------------------------------
+
+
 def analyze_project(root: Path) -> Dict[str, Any]:
     report = {}
     root = Path(root)
-
+    
     # Build filtered file tree
     report['file_tree'] = build_file_tree(root)
     
-    # print(json.dumps(report['file_tree'], indent=2))
-
     analyses = {}
     call_graph = nx.DiGraph()
-
-   # REPLACE WITH THIS:
+    all_functions = {}
+    
+    # First pass: collect all functions
     for p in root.rglob("*"):
-        # skip ignored files/folders
         if should_ignore(p):
             continue
 
-        if p.is_file():
-            ext = p.suffix.lower()
-            lang = LANG_EXTENSIONS.get(ext)
+        if p.is_file() and p.suffix.lower() == ".py":
             relative_path = str(p.relative_to(root))
-
-            if lang == "python":
-                try:
-                    parsed = parse_python_file(p)
-                    raw_code = p.read_text(encoding="utf-8", errors="ignore")
-                    
-                    # Get structured summary (no need for clean_code_for_summary - it's handled in summarizer now)
-                    summary_data = get_cached_summary(relative_path, raw_code)
-                    
-                    # Ensure summary is properly stored
-                    analyses[relative_path] = {
-                        "lang": "python", 
-                        **parsed,
-                        "summary": summary_data  # This is now a dict
+            
+            try:
+                parsed = parse_python_file(p)
+                raw_code = p.read_text(encoding="utf-8", errors="ignore")
+                
+                # Store functions
+                for func in parsed.get("functions", []):
+                    func_name = func['name']
+                    node_id = f"{relative_path}:{func_name}"
+                    all_functions[node_id] = {
+                        "file": relative_path,
+                        "function": func,
+                        "calls": func.get("calls", [])
                     }
-
-                    # Graph nodes
-                    for func in parsed.get("functions", []):
-                        node_name = f"{p.name}:{func['name']}"
-                        call_graph.add_node(node_name, file=relative_path, type="function")
-
-                    # Graph edges
-                    for edge in parsed.get("call_edges", []):
-                        caller = f"{p.name}:{edge['caller']}"
-                        callee = f"{p.name}:{edge['callee']}"
-                        call_graph.add_edge(caller, callee)
-
-                except Exception as e:
-                    print(f"[ERROR] Failed to analyze {relative_path}: {e}")
-                    analyses[relative_path] = {
-                        "lang": "python", 
-                        "error": str(e),
-                        "summary": {"summary": "Analysis failed", "external_imports": []}
-                    }
-
-            else:
-                # Non-python files
+                
+                # Get summary
+                summary_data = get_cached_summary(relative_path, raw_code)
+                
                 analyses[relative_path] = {
-                    "lang": lang or "unknown",
-                    "note": "parsing not implemented",
-                    "summary": {"summary": "Non-Python file", "external_imports": []}
+                    "lang": "python", 
+                    **parsed,
+                    "summary": summary_data
                 }
-
+                
+            except Exception as e:
+                print(f"[ERROR] Failed to analyze {relative_path}: {e}")
+                analyses[relative_path] = {
+                    "lang": "python", 
+                    "error": str(e),
+                    "summary": {"summary": "Analysis failed", "external_imports": []}
+                }
+    
+    # Add nodes to graph
+    for node_id, func_data in all_functions.items():
+        func_info = func_data["function"]
+        call_graph.add_node(
+            node_id,
+            file=func_data["file"],
+            function=func_info['name'],
+            simple_name=func_info['name'].split('.')[-1],
+            lineno=func_info['lineno']
+        )
+    
+    # Build edges - SIMPLIFIED: Only add cross-file edges
+    for node_id, func_data in all_functions.items():
+        file_path = func_data["file"]
+        calls = func_data["calls"]
+        
+        for callee_name in calls:
+            # Look for the callee in ALL functions
+            found_callee = None
+            
+            for candidate_id, candidate_data in all_functions.items():
+                candidate_file = candidate_data["file"]
+                candidate_name = candidate_data["function"]["name"]
+                
+                # Skip if same file (we're only showing cross-file calls)
+                if candidate_file == file_path:
+                    continue
+                
+                # Check for match
+                if (callee_name == candidate_name or 
+                    callee_name.endswith(f".{candidate_name.split('.')[-1]}")):
+                    found_callee = candidate_id
+                    break
+            
+            if found_callee:
+                call_graph.add_edge(node_id, found_callee, type="cross_file")
+    
     report['files'] = analyses
-
-    # -------------------------------------------
-    # Render call graph (unchanged)
-    # -------------------------------------------
-    # dot = Digraph(comment="Call graph")
-    # for n in call_graph.nodes:
-    #     dot.node(n)
-    # for u, v in call_graph.edges:
-    #     dot.edge(u, v)
-
-    # graph_path = root / "call_graph.svg"
-    # dot.render(str(graph_path.with_suffix("")), format="svg", cleanup=True)
-    # report['call_graph'] = "call_graph.svg"
-
-    # New 01
-
-    dot = Digraph(comment="Call graph")
-    for n in call_graph.nodes:
-        dot.node(n)
-    for u, v in call_graph.edges:
-        dot.edge(u, v)
-
-    # Ensure static folder exists
+    
+    # Create CLEAN, SIMPLE graph visualization
+    dot = Digraph(comment="Call Graph - Cross-File Dependencies",
+                  engine='fdp')  # Using fdp for better force-directed layout
+    
+    # Configure graph for clean, spacious layout
+    dot.attr(
+        rankdir='TB',  # Top to bottom
+        splines='curved',  # Curved edges for better readability
+        overlap='scale',  # Prevent node overlap
+        sep='1.2',  # Increase separation between nodes
+        nodesep='0.8',  # Space between nodes
+        ranksep='1.5',  # Space between ranks
+        concentrate='false',  # Don't merge parallel edges
+        bgcolor='transparent'
+    )
+    
+    # Group nodes by file for better organization
+    file_colors = {}
+    color_palette = ['#FFE4E1', '#E0FFFF', '#F0FFF0', '#FFF0F5', '#F5FFFA', 
+                     '#FFFACD', '#F0F8FF', '#F8F8FF', '#FAF0E6', '#F5F5DC']
+    
+    # Assign a color to each file
+    files = sorted(set([all_functions[node_id]["file"] for node_id in all_functions.keys()]))
+    for i, file in enumerate(files):
+        file_colors[file] = color_palette[i % len(color_palette)]
+    
+    # Add nodes with clean, minimal styling
+    for node_id in sorted(call_graph.nodes()):
+        func_data = all_functions[node_id]
+        file_path = func_data["file"]
+        func_info = func_data["function"]
+        
+        # Get short file name for display
+        file_name = file_path.split('/')[-1] if '/' in file_path else file_path
+        simple_func_name = func_info['name'].split('.')[-1]
+        
+        # Create clean label
+        label = f"{simple_func_name}\\n({file_name}:{func_info['lineno']})"
+        
+        dot.node(
+            node_id,
+            label=label,
+            shape='box',
+            style='filled,rounded',
+            fillcolor=file_colors.get(file_path, 'lightblue'),
+            fontname='Arial',
+            fontsize='12',  # Increased from '10' to '12'
+            width='1.5',  # Increased from '1.2'
+            height='1.0',  # Increased from '0.8'
+            margin='0.15,0.10'  # Small margin inside node
+        )
+    
+    # Add only cross-file edges (filter out any self-references or same-file edges)
+    edge_count = 0
+    for u, v, edge_data in call_graph.edges(data=True):
+        if edge_data.get('type') == 'cross_file':
+            u_file = all_functions[u]["file"]
+            v_file = all_functions[v]["file"]
+            
+            # Skip if same file (shouldn't happen but just in case)
+            if u_file == v_file:
+                continue
+                
+            # Color edge black
+            edge_color = 'black'  # Changed from file_colors.get(u_file, 'gray')
+            
+            dot.edge(
+                u, v,
+                color=edge_color,  # Now always black
+                penwidth='1.2',
+                arrowsize='0.8',
+                fontname='Arial',
+                fontsize='8',
+                label=''
+            )
+            edge_count += 1
+    
+    print(f"Created graph with {call_graph.number_of_nodes()} nodes and {edge_count} cross-file edges")
+    
+    # Save graph
     STATIC_DIR = Path("/app/static")
     STATIC_DIR.mkdir(parents=True, exist_ok=True)
-
-    # Save SVG with a unique timestamp to avoid overwriting
+    
     graph_filename = f"call_graph_{int(time.time())}.svg"
     graph_path = STATIC_DIR / graph_filename
     dot.render(str(graph_path.with_suffix("")), format="svg", cleanup=True)
-
-    # Pass only the filename to frontend
+    
     report['call_graph'] = graph_filename
-
-
-    # # -------------------------------------------
-    # # Markdown summary (unchanged)
-    # # -------------------------------------------
-    # md = ["# Project Report", ""]
-    # md.append("## File Summaries")
-
-    # for fname, info in analyses.items():
-    #     md.append(f"### {fname}")
-    #     md.append(f"Language: {info.get('lang')}")
-
-    #     if info.get("error"):
-    #         md.append(f"Error: {info['error']}")
-    #     else:
-    #         if info.get("summary"):
-    #             md.append(info['summary'])
-    #         funcs = info.get("functions", [])
-    #         if funcs:
-    #             md.append("Functions:")
-    #             for f in funcs:
-    #                 md.append(f"- {f['name']} ({f['lineno']})")
-
-    # report_md = "\n".join(md)
-    # report['markdown'] = report_md
-    # report['html'] = markdown.markdown(report_md)
-
-    # print(json.dumps(report['file_tree'], indent=2))
-
+    
+    # Simple statistics
+    stats = {
+        "total_functions": call_graph.number_of_nodes(),
+        "cross_file_calls": edge_count,
+        "files_with_functions": len(files)
+    }
+    
+    print(f"Graph stats: {stats['total_functions']} functions across {stats['files_with_functions']} files")
+    print(f"Cross-file dependencies: {stats['cross_file_calls']}")
 
     # -------------------------------------------
     # Fixed Markdown summary

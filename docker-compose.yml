@@ -12,7 +12,7 @@ services:
     volumes:
       - ./backend:/app   # OK for dev, installed packages live in /venv so won't be overwritten
     stdin_open: true
-    tty: true-
+    tty: true
 
   frontend:
     build: ./frontend

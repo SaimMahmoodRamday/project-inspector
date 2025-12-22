@@ -2,8 +2,6 @@
 
 **Project Inspector** is a Dockerized full-stack application that analyzes a project folder, generates dependency graphs, and produces AI-based code summaries to help developers quickly understand unfamiliar codebases.
 
-![Project Inspector UI](docs/ui.png)
-
 ---
 
 ## ✨ Features

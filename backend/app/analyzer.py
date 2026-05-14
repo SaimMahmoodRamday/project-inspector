@@ -2,18 +2,15 @@
 # backend/app/analyzer.py
 from pathlib import Path
 import os
-from typing import Dict, Any, List
+import time
+import base64
+from typing import Dict, Any
 from app.parsers.python_parser import parse_python_file
 import networkx as nx
 from graphviz import Digraph
 import markdown
 from app.summarizer import clean_code_for_summary, get_cached_summary
-import json
-import time  
-from app.summarizer import get_cached_summary
 
-from collections import defaultdict
-import math
 
 # ----------------------------
 # IGNORE CONSTANTS (ADDED)
@@ -250,15 +247,31 @@ def analyze_project(root: Path) -> Dict[str, Any]:
     
     print(f"Created graph with {call_graph.number_of_nodes()} nodes and {edge_count} cross-file edges")
     
-    # Save graph
-    STATIC_DIR = Path("/app/static")
-    STATIC_DIR.mkdir(parents=True, exist_ok=True)
-    
-    graph_filename = f"call_graph_{int(time.time())}.svg"
-    graph_path = STATIC_DIR / graph_filename
-    dot.render(str(graph_path.with_suffix("")), format="svg", cleanup=True)
-    
-    report['call_graph'] = graph_filename
+    # ── Option A: File on disk + URL (commented out) ─────────────────────────
+    # Kept for reference. Breaks on multi-replica Container Apps because each
+    # replica has isolated ephemeral storage, so a different replica may serve
+    # the browser's GET /static/<file> request and return 404.
+    # Also: FastAPI StaticFiles is not covered by CORSMiddleware, so cross-origin
+    # <img> requests are blocked without an extra CORS header.
+    #
+    # STATIC_DIR = Path("/app/static")
+    # STATIC_DIR.mkdir(parents=True, exist_ok=True)
+    # graph_filename = f"call_graph_{int(time.time())}.svg"
+    # graph_path = STATIC_DIR / graph_filename
+    # dot.render(str(graph_path.with_suffix("")), format="svg", cleanup=True)
+    # report['call_graph'] = f"https://project-inspector-backend.proudfield-b0f3558f.eastus.azurecontainerapps.io/static/{graph_filename}"
+    # ─────────────────────────────────────────────────────────────────────────
+
+    # ── Option B: Data URI embedded in JSON response (active) ─────────────────
+    # SVG bytes are base64-encoded and returned as a data: URI inside the JSON.
+    # - No disk I/O, no storage to clean up, no storage runout risk
+    # - Works correctly across any number of replicas (stateless)
+    # - No CORS issue — the data is already in the /upload response body
+    # - <img src="data:image/svg+xml;base64,..."> works in all modern browsers
+    svg_bytes = dot.pipe(format="svg")
+    svg_b64 = base64.b64encode(svg_bytes).decode("utf-8")
+    report['call_graph'] = f"data:image/svg+xml;base64,{svg_b64}"
+    # ─────────────────────────────────────────────────────────────────────────
     
     # Simple statistics
     stats = {

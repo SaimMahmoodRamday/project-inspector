@@ -108,7 +108,8 @@ export default function ReportView({ report }) {
           <div className="px-8 pb-8">
             <div className="bg-gray-50 p-4 rounded-xl border">
               <img 
-                src={`/static/${report.call_graph}`} 
+                // src={`/static/${report.call_graph}`} 
+                src={report.call_graph}
                 alt="Function Call Graph" 
                 className="w-full rounded-lg shadow-sm" 
               />

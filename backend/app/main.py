@@ -5,22 +5,42 @@ import tempfile
 import os
 from pathlib import Path
 from zipfile import ZipFile
-from typing import Dict, Any, List
+from typing import Dict, Any
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.analyzer import analyze_project
 import uvicorn
-from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title="Project Inspector")
 
-STATIC_DIR = Path("/app/static")
-STATIC_DIR.mkdir(parents=True, exist_ok=True)  # ensures folder exists
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://project-inspector-frontend.proudfield-b0f3558f.eastus.azurecontainerapps.io"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Serve call graph SVGs and any other static assets
-app.mount("/static", StaticFiles(directory="/app/static"), name="static")
+# StaticFiles mount — only needed for Option A (file-on-disk approach).
+# Commented out because SVGs are now returned as data URIs (Option B in analyzer.py).
+# Re-enable if switching back to file-based delivery.
+# STATIC_DIR = Path("/app/static")
+# STATIC_DIR.mkdir(parents=True, exist_ok=True)
+# app.mount("/static", StaticFiles(directory="/app/static"), name="static")
 
-MAX_ZIP_SIZE = 200 * 1024 * 1024  # 200 MB, adjust as needed
+MAX_ZIP_SIZE = 200 * 1024 * 1024  # 200 MB
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for Azure Container Apps readiness probes."""
+    return {"status": "ok"}
 
 @app.post("/upload")
 async def upload_zip(file: UploadFile = File(...)):
@@ -44,7 +64,6 @@ async def upload_zip(file: UploadFile = File(...)):
         # Run analysis
         report = analyze_project(extract_dir)
 
-        # Optionally write report to disk and return a link or contents
         return JSONResponse(content=report)
     finally:
         # cleanup zip (but keep extracted results until process done)

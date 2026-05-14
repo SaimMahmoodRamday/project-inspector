@@ -1,29 +1,54 @@
 # 🕵️ Project Inspector
 
-**Project Inspector** is a full-stack AI-powered tool that analyzes a zipped project folder and returns a visual function call graph, per-file code summaries, and a structured dependency report — helping developers quickly understand unfamiliar codebases.
+**Project Inspector** is a full-stack, cloud-native AI developer tool. Upload any codebase as a `.zip` and get back a full static analysis — a visual cross-file function call graph, per-file AI-generated summaries, and a structured dependency report — all rendered instantly in the browser.
 
-[![Deploy to Azure](https://img.shields.io/badge/Deployed%20on-Azure%20Container%20Apps-0078D4?logo=microsoftazure)](https://project-inspector-frontend.proudfield-b0f3558f.eastus.azurecontainerapps.io)
+<!-- Built to run at scale on Azure Container Apps with zero-downtime CI/CD via GitHub Actions. -->
+
+<!-- [![Live Demo](https://img.shields.io/badge/Live%20Demo-Azure%20Container%20Apps-0078D4?logo=microsoftazure)](https://project-inspector-frontend.proudfield-b0f3558f.eastus.azurecontainerapps.io) -->
 
 ---
 
 ## ✨ Features
 
-- 📦 Upload any project as a `.zip` file via the web UI
-- 🔗 Visual function call graph (NetworkX + Graphviz, rendered as inline SVG)
-- 🤖 Per-file AI summaries with Gemini (Groq as fallback)
-- 📄 Markdown analysis report rendered in the browser
-- 🐳 Fully Dockerized — runs locally or on any cloud
+- **Cross-file call graph** — statically parses Python AST to extract function definitions, call sites, and cross-module dependencies, then renders an interactive SVG graph using NetworkX and Graphviz
+- **AI code summaries** — sends each file through Google Gemini (`gemini-2.5-flash-lite`) with automatic fallback to Groq (`llama-3.1-8b-instant`) if the primary model is unavailable
+- **Structured analysis report** — generates a Markdown report with function inventory, import graph, and dependency highlights, rendered live in the browser
+- **Resilient by design** — dual-LLM fallback, per-file error isolation (one broken file never aborts the full analysis), and a response cache to avoid redundant LLM calls
+- **Stateless & cloud-native** — SVGs are embedded as base64 data URIs in the API response, so the app works correctly across any number of replicas with no shared storage
+- **Production-deployed** — containerized with Docker, hosted on Azure Container Apps, with CI/CD via GitHub Actions on every push to `main`
 
 ---
 
-## 🏗 Tech Stack
+## 🏗️ Architecture & Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Backend | FastAPI, NetworkX, Graphviz, LangChain |
-| Frontend | React + Vite, Tailwind CSS, Nginx |
-| AI | Google Gemini (`gemini-2.5-flash-lite`), Groq (`llama-3.1-8b-instant`) |
-| DevOps | Docker, Azure Container Apps, Azure Container Registry, GitHub Actions |
+### Backend
+
+| Component | Technology | Role |
+|---|---|---|
+| API Framework | **FastAPI** | Async REST API, automatic OpenAPI docs at `/docs` |
+| Static Analysis | **Python AST + NetworkX** | Parses source files, builds directed call graph |
+| Graph Rendering | **Graphviz (fdp engine)** | Force-directed SVG layout, returned as inline data URI |
+| AI Summarization | **LangChain + Google Gemini** | Per-file code summaries, 50-word max, structured output |
+| LLM Fallback | **Groq (LLaMA 3.1 8B)** | Automatic failover if Gemini rate-limits or errors |
+| Response Cache | **MD5-keyed JSON file** | Avoids re-summarizing unchanged files across uploads |
+
+### Frontend
+
+| Component | Technology | Role |
+|---|---|---|
+| Framework | **React 18 + Vite** | SPA with fast HMR in dev, optimized production bundle |
+| Styling | **Tailwind CSS** | Utility-first responsive layout |
+| HTTP Client | **Fetch API** | Streams ZIP upload with loading state and error handling |
+| Server | **Nginx (Alpine)** | Serves static assets, reverse-proxies `/upload` to backend |
+
+### Infrastructure
+
+| Component | Technology | Role |
+|---|---|---|
+| Containerization | **Docker** (multi-stage builds) | Separate optimized images for backend and frontend |
+| Container Registry | **Azure Container Registry** | Private image hosting with versioned SHA tags |
+| Hosting | **Azure Container Apps** | Serverless containers, scale-to-zero on Consumption plan |
+| CI/CD | **GitHub Actions** | Auto-build and deploy on push to `main` |
 
 ---
 
@@ -103,9 +128,9 @@ Deployed on **Azure Container Apps** with images hosted on **Azure Container Reg
 | Backend App | `project-inspector-backend` |
 | Frontend App | `project-inspector-frontend` |
 
-**Live URLs:**
+<!-- **Live URLs:**
 - Frontend: https://project-inspector-frontend.proudfield-b0f3558f.eastus.azurecontainerapps.io
-- Backend: https://project-inspector-backend.proudfield-b0f3558f.eastus.azurecontainerapps.io
+- Backend: https://project-inspector-backend.proudfield-b0f3558f.eastus.azurecontainerapps.io -->
 
 ### Manual deployment
 
@@ -184,3 +209,5 @@ Paste the full JSON output as the `AZURE_CREDENTIALS` secret.
 ## 📜 License
 
 This project is licensed under the [MIT License](LICENSE).
+
+---
